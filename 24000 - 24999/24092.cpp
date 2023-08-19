@@ -1,36 +1,13 @@
 #include <iostream>
-#include <vector>
 using namespace std;
 
-bool isSame();
-void print(int n);
 void quick_sort(int p, int r);
+void swap(int i, int j);
+void isSame();
 int partition(int p, int r);
 
-int N; // 배열의 크기 N
-int sameIdx = -1; // 두 배열이 같은 인덱스
-vector <int> A(10001);
-vector <int> B(10001);
-
-// 두 배열이 같은가?
-bool isSame() {
-    if (sameIdx < 0) sameIdx = 0;
-
-    for (int i = sameIdx; i < N; i++) {
-        if (A[i] != B[i]) {
-            sameIdx = i - 1;
-            return false;
-        }
-    }
-
-    return true;
-}
-
-// 출력
-void print(int n) {
-    printf("%d\n" , n);
-    exit(0);
-}
+int N, cnt = 0;
+int A[10001], B[10001];
 
 // A[p..r]을 오름차순 정렬한다.
 void quick_sort(int p, int r) {
@@ -42,53 +19,60 @@ void quick_sort(int p, int r) {
     }
 }
 
-int partition(int p, int r) {
-    int x = A[r]; // 기준원소
-    int i = p - 1; // i는 x보다 작거나 작은 원소들의 끝지점
+// 원소 교환
+void swap(int i, int j) {
+    cnt -= ((A[i] == B[i]) + (A[j] == B[j]));
 
-    // j는 아직 정해지지 않은 원소들의 시작 지점
-    for (int j = p; j < r; j++) {
-        // i값 증가 후 A[i], A[j] 교환
-        if (A[j] <= x) {
-            int tmp = A[++i];
-            A[i] = A[j];
-            A[j] = tmp;
+    int tmp = A[i];
+    A[i] = A[j];
+    A[j] = tmp;
 
-            // 배열 A가 배열 B와 같은 경우
-            if (A[j] == B[j] || A[i] == B[i])
-                if (isSame()) print(1);
-        }
+    cnt += ((A[i] == B[i]) + (A[j] == B[j]));
+
+    isSame();
+}
+
+// A와 B 비교
+void isSame() {
+    if (cnt == N) {
+        cout << "1\n";
+        exit(0);
     }
+}
+
+int partition(int p, int r) {
+    int x = A[r];   // 기준원소
+    int i = p - 1;  // i는 x보다 작거나 작은 원소들의 끝지점
+
+    // j는 아직 정해지지 않은 원소들의 시작 지점, i값 증가 후 A[i], A[j] 교환
+    for (int j = p; j < r; j++)
+        if (A[j] <= x) swap(++i, j);
 
     // i + 1과 r이 서로 다르면 A[i + 1]과 A[r]을 교환
-    if (i + 1 != r) {
-        int tmp = A[r];
-        A[r] = A[i + 1];
-        A[i + 1] = tmp;
-
-        // 배열 A가 배열 B와 같은 경우
-        if (A[i + 1] == B[i + 1] || A[r] == B[r])
-            if (isSame()) print(1);
-    }
+    if (i + 1 != r) swap(r, i + 1);
 
     return i + 1;
 }
 
 int main() {
-    scanf("%d", &N);
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
 
-    for (int i = 0; i < N; i++)
-        scanf("%d", &A[i]);
+    cin >> N;
 
-    for (int i = 0; i < N; i++)
-        scanf("%d", &B[i]);
+    for (int i = 0; i < N; i++) cin >> A[i];
+    for (int i = 0; i < N; i++) {
+        cin >> B[i];
 
-    // 배열 A가 배열 B와 같은 경우
-    if (A == B) print(1);
+        if (A[i] == B[i]) cnt++;
+    }
+
+    isSame();
 
     quick_sort(0, N - 1);
 
-    printf("0\n");
+    cout << "0\n";
 
-	return 0;
+    return 0;
 }
